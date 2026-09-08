@@ -1,6 +1,6 @@
 bin/
+build/
+construir/
 .settings/
-.calspath
-.claspath
-.project
 .classpath
+.project
