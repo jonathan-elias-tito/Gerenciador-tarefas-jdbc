@@ -8,5 +8,5 @@ public  interface UserDao {
 	void update(User obj);
 	void deleteById(Integer Id);
 	User findById(Integer Id);
-	 List<User> findAll (User obj);
+	 List<User> findAll ();
 }

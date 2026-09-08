@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DbException;
 import model.dao.UserDao;
@@ -121,11 +124,11 @@ public class UserJDBC implements UserDao {
 			throw new DbException("Error in connection:" + e.getMessage());
 		} finally {
 			try {
-				if (st != null) 
+				if (st != null)
 					st.close();
 				if (rs != null)
 					rs.close();
-				
+
 			} catch (SQLException e) {
 				throw new DbException("Error closing statement:" + e.getMessage());
 			}
@@ -133,9 +136,34 @@ public class UserJDBC implements UserDao {
 	}
 
 	@Override
-	public List<User> findAll(User obj) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<User> findAll() {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement("SELECT * FROM User");
+			rs = st.executeQuery();
+			List<User> lista = new ArrayList<>();
+			while (rs.next()) {
+			
+					User obj = new User();
+					obj.setId(rs.getInt("Id"));
+					obj.setName(rs.getString("name"));
+					obj.setEmail(rs.getString("email"));
+				lista.add(obj);
+			}
+			return lista;
+		} catch (SQLException e) {
+			throw new DbException("Error in connection:" + e.getMessage());
+		} finally {
+			try {
+				if (st != null)
+					st.close();
+				if (rs != null)
+					rs.close();
+			} catch (SQLException e) {
+				throw new DbException("Error closing statement:" + e.getMessage());
+			}
+		}
 	}
 
 }
