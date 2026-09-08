@@ -1,5 +1,8 @@
 package model.dao.impl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 
 import model.dao.TaskDao;
@@ -8,10 +11,13 @@ import model.entities.User;
 
 public class TaskJDBC implements TaskDao {
 
+	private static Connection conn = null;
+	public TaskJDBC(Connection conn) {
+		this.conn=conn;;
+	}
 	@Override
 	public void insert(Task obj) {
-		
-		
+
 	}
 
 	@Override

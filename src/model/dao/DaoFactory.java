@@ -5,7 +5,7 @@ import model.dao.impl.TaskJDBC;
 import model.dao.impl.UserJDBC;
 
 public class DaoFactory {
-	public UseJDBC createUserDao() {
+	public static UserJDBC createUserDao() {
 		return new UserJDBC(DbConn.initConection());
 	}
 
