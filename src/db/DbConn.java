@@ -20,10 +20,9 @@ public class DbConn {
 				conn = DriverManager.getConnection(url, props);
 			}
 		} catch (SQLException e) {
-			throw new DbException("Erro de conexão com o banco casa:" + e.getMessage());
+			throw new DbException("Erro de conexão com o banco causa:" + e.getMessage());
 		}
 		return conn;
-		
 
 	}
 
@@ -56,7 +55,7 @@ public class DbConn {
 				try {
 					fs.close();
 				} catch (IOException e) {
-					throw new DbException("Erro ao fechar arquivo" + e.getMessage());
+					throw new DbException("Erro ao fechar arquivo causa:" + e.getMessage());
 				}
 			}
 		}
