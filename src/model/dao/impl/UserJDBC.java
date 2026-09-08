@@ -11,7 +11,6 @@ import db.DbException;
 import model.dao.UserDao;
 import model.entities.User;
 
-
 public class UserJDBC implements UserDao {
 	private static Connection conn = null;
 
@@ -36,10 +35,12 @@ public class UserJDBC implements UserDao {
 				if (rs.next()) {
 					int id = rs.getInt(1);
 					obj.setId(id);
-				} 
+				}
 				rs.close();
 
-			}else {throw new DbException("Insert failed: No rows affected.");}
+			} else {
+				throw new DbException("Insert failed: No rows affected.");
+			}
 
 		} catch (SQLException e) {
 			throw new DbException("Error:" + e.getMessage());
@@ -80,26 +81,55 @@ public class UserJDBC implements UserDao {
 
 	@Override
 	public void deleteById(Integer Id) {
- PreparedStatement st =null;
-try {st = conn.prepareStatement("DELETE FROM User  WHERE Id = ? ");
-	st.setInt(1, Id);
-	int rows = st.executeUpdate();
-	if(rows == 0) {
-		throw new DbException("Delete failed: ID not found.");
-	}
-}catch(SQLException e ) {
-	throw new DbException("Error on delete"+e.getMessage());
-}finally {
-	try {
-	if(st != null) st.close();
-	}catch(SQLException e) {throw new DbException("Error closing statement:"+e.getMessage());}
-	}
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement("DELETE FROM User  WHERE Id = ? ");
+			st.setInt(1, Id);
+			int rows = st.executeUpdate();
+			if (rows == 0) {
+				throw new DbException("Delete failed: ID not found.");
+			}
+		} catch (SQLException e) {
+			throw new DbException("Error on delete" + e.getMessage());
+		} finally {
+			try {
+				if (st != null)
+					st.close();
+			} catch (SQLException e) {
+				throw new DbException("Error closing statement:" + e.getMessage());
+			}
+		}
 	}
 
 	@Override
 	public User findById(Integer Id) {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement("SELECT * FROM User WHERE Id = ? ");
+			st.setInt(1, Id);
+			rs = st.executeQuery();
+			if (rs.next()) {
+				User obj = new User();
+				obj.setId(rs.getInt("id"));
+				obj.setName(rs.getString("name"));
+				obj.setEmail(rs.getString("email"));
+				return obj;
+			}
+			return null;
+		} catch (SQLException e) {
+			throw new DbException("Error in connection:" + e.getMessage());
+		} finally {
+			try {
+				if (st != null) 
+					st.close();
+				if (rs != null)
+					rs.close();
+				
+			} catch (SQLException e) {
+				throw new DbException("Error closing statement:" + e.getMessage());
+			}
+		}
 	}
 
 	@Override
