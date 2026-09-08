@@ -1,5 +1,5 @@
 package model.dao.impl;
 
-public class UserJDBC {
+public class UserJDBC implements UserDao {
 
 }
