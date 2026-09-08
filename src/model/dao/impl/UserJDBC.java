@@ -7,10 +7,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import db.DbConn;
 import db.DbException;
 import model.dao.UserDao;
 import model.entities.User;
+
 
 public class UserJDBC implements UserDao {
 	private static Connection conn = null;
@@ -36,19 +36,19 @@ public class UserJDBC implements UserDao {
 				if (rs.next()) {
 					int id = rs.getInt(1);
 					obj.setId(id);
-				}
+				} 
 				rs.close();
 
-			}
+			}else {throw new DbException("Insert failed: No rows affected.");}
 
 		} catch (SQLException e) {
-			throw new DbException("Erro causa:" + e.getMessage());
+			throw new DbException("Error:" + e.getMessage());
 		} finally {
 			try {
-				st.close();
+				if (st != null)
+					st.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new DbException("Error closing statement:" + e.getMessage());
 			}
 		}
 	}
@@ -56,7 +56,6 @@ public class UserJDBC implements UserDao {
 	@Override
 	public void update(User obj) {
 		PreparedStatement st = null;
-		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement("UPDATE User " + "SET name = ? , email = ? " + "WHERE Id = ? ");
 			st.setString(1, obj.getName());
@@ -68,20 +67,33 @@ public class UserJDBC implements UserDao {
 				throw new DbException("Update failed: ID not found");
 			}
 		} catch (SQLException e) {
-			throw new DbException("Erroe:" + e.getMessage());
+			throw new DbException("Error:" + e.getMessage());
 		} finally {
 			try {
-				st.close();
+				if (st != null)
+					st.close();
 			} catch (SQLException e) {
-				throw new DbException("Error closing statement:"+e.getMessage());
+				throw new DbException("Error closing statement:" + e.getMessage());
 			}
 		}
 	}
 
 	@Override
 	public void deleteById(Integer Id) {
-		// TODO Auto-generated method stub
-
+ PreparedStatement st =null;
+try {st = conn.prepareStatement("DELETE FROM User  WHERE Id = ? ");
+	st.setInt(1, Id);
+	int rows = st.executeUpdate();
+	if(rows == 0) {
+		throw new DbException("Delete failed: ID not found.");
+	}
+}catch(SQLException e ) {
+	throw new DbException("Error on delete"+e.getMessage());
+}finally {
+	try {
+	if(st != null) st.close();
+	}catch(SQLException e) {throw new DbException("Error closing statement:"+e.getMessage());}
+	}
 	}
 
 	@Override

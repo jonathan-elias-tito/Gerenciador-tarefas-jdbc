@@ -5,7 +5,6 @@ import java.sql.Connection;
 import db.DbConn;
 import model.dao.DaoFactory;
 import model.dao.UserDao;
-import model.dao.impl.UserJDBC;
 import model.entities.User;
 
 public class Program {
@@ -15,16 +14,17 @@ public class Program {
 		Connection conn = DbConn.initConection();
 		System.out.println("Conectado");
 		DbConn.closeConnection();
-		System.out.println("Teste insert");
+		System.out.println("Test insert");
 		UserDao user = DaoFactory.createUserDao();
-		User u1 = new User(null,"Kaio","Kaio@gmail.com");
-//		user.insert(u1);
-//		System.out.println(u1.getId());
-		System.out.println("Teste update");
-		u1.setName("KaioSilva");
-		u1.setEmail("KaioS@gmail.com");
-		u1.setId(12);
+		User u1 = new User(null,"Jonathan","Jonh@gmail.com");
+		user.insert(u1);
+		System.out.println("Test update");
+		u1.setName("Jonathan Elias");
+		u1.setEmail("jonElias@gmail.com");
 		user.update(u1);
+		System.out.println("Test delete");
+		user.deleteById(2);
+		
 	}
 
 }
