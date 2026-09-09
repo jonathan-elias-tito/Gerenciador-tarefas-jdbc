@@ -9,7 +9,7 @@ public class DaoFactory {
 		return new UserJDBC(DbConn.initConection());
 	}
 
-	public TaskJDBC createTaskDao() {
+	public static TaskJDBC createTaskDao() {
 		return new TaskJDBC(DbConn.initConection());
 	}
 }

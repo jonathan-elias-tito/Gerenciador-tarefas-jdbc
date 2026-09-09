@@ -144,11 +144,11 @@ public class UserJDBC implements UserDao {
 			rs = st.executeQuery();
 			List<User> lista = new ArrayList<>();
 			while (rs.next()) {
-			
-					User obj = new User();
-					obj.setId(rs.getInt("Id"));
-					obj.setName(rs.getString("name"));
-					obj.setEmail(rs.getString("email"));
+
+				User obj = new User();
+				obj.setId(rs.getInt("Id"));
+				obj.setName(rs.getString("name"));
+				obj.setEmail(rs.getString("email"));
 				lista.add(obj);
 			}
 			return lista;
