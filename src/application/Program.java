@@ -15,7 +15,7 @@ public class Program {
 	public static void main(String[] args) {
 
 		Connection conn = DbConn.initConection();
-		System.out.println("Conectado");
+		System.out.println("Connected");
 		System.out.println("Test insert");
 		UserDao user = DaoFactory.createUserDao();
 		User u1 = new User(null,"Jonathan","Jonh@gmail.com");
