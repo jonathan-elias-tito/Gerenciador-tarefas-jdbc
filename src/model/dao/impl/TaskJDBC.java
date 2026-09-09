@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+
 import db.DbException;
 import model.dao.TaskDao;
 import model.entities.Task;
@@ -62,12 +63,9 @@ public class TaskJDBC implements TaskDao {
 	@Override
 	public void update(Task obj) {
 		PreparedStatement st = null;
-		ResultSet rs = null;
 		try {
-			st = conn.prepareStatement(
-					"UPDATE Task "
-							+"SET title = ?,description = ?,data_entrega = ?,status = ?,user_id = ? "
-							+ "WHERE id = ? ");
+			st = conn.prepareStatement("UPDATE Task "
+					+ "SET title = ?,description = ?,data_entrega = ?,status = ?,user_id = ? " + "WHERE id = ? ");
 			st.setString(1, obj.getTitulo());
 			st.setString(2, obj.getDescricao());
 			st.setDate(3, new java.sql.Date(obj.getDataEntrega().getTime()));
@@ -92,8 +90,26 @@ public class TaskJDBC implements TaskDao {
 
 	@Override
 	public void deleteById(Integer Id) {
-		// TODO Auto-generated method stub
 
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement("DELETE FROM Task " + "WHERE id = ? ");
+			st.setInt(1, Id);
+			int rows = st.executeUpdate();
+			if (rows == 0) {
+				throw new DbException("Delete failed: ID not found.");
+			}
+
+		} catch (SQLException e) {
+			throw new DbException("Error on delete" + e.getMessage());
+		} finally {
+			try {
+				if (st != null)
+					st.close();
+			} catch (SQLException e) {
+				throw new DbException("Error closing statement:" + e.getMessage());
+			}
+		}
 	}
 
 	@Override
