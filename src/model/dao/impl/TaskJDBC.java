@@ -5,8 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 import db.DbException;
 import model.dao.TaskDao;
@@ -101,7 +103,7 @@ public class TaskJDBC implements TaskDao {
 			}
 
 		} catch (SQLException e) {
-			throw new DbException("Error on delete" + e.getMessage());
+			throw new DbException("Error on delete:" + e.getMessage());
 		} finally {
 			try {
 				if (st != null)
@@ -114,19 +116,89 @@ public class TaskJDBC implements TaskDao {
 
 	@Override
 	public List<Task> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement("SELECT task.*, user.name AS user_name, user.email AS user_email " + "FROM task "
+					+ "INNER JOIN user ON task.user_id = user.id");
+			rs = st.executeQuery();
+			List<Task> lista = new ArrayList<>();
+			Map<Integer, User> map = new HashMap<>();
+			while (rs.next()) {
+				User objU = map.get(rs.getInt("user_id"));
+				if (objU == null)
+					objU = new User();
+				objU.setId(rs.getInt("user_id"));
+				objU.setName(rs.getString("user_name"));
+				objU.setEmail(rs.getString("user_email"));
+				map.put(rs.getInt("user_id"), objU);
+				Task obj = new Task();
+				obj.setId(rs.getInt("id"));
+				obj.setTitulo(rs.getString("title"));
+				obj.setDescricao(rs.getString("description"));
+				obj.setStatus(rs.getString("status"));
+				obj.setId(rs.getInt("id"));
+				obj.setUser(objU);
+				lista.add(obj);
+			}
+			return lista;
+		} catch (SQLException e) {
+			throw new DbException("Erro on findAll" + e.getMessage());
+		} finally {
+			try {
+				if (st != null)
+					st.close();
+				if (rs != null)
+					;
+				rs.close();
+			} catch (SQLException e) {
+				throw new DbException("Error closing statement:" + e.getMessage());
+			}
+		}
 	}
 
 	@Override
-	public List<Task> findById(Task Id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Task findById(Integer Id) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+
+		try {
+			st = conn.prepareStatement("SELECT task.*, user.name AS user_name, user.email AS user_email  "
+					+"FROM task INNER JOIN user ON task.user_id = user.id " +
+		            "WHERE task.id = ? ");
+			st.setInt(1, Id);
+			rs = st.executeQuery();
+			if (rs.next()) {
+				User objU = new User();
+				objU.setId(rs.getInt("user_id"));
+				objU.setName(rs.getString("user_name"));
+				objU.setEmail(rs.getString("user_email"));
+				Task obj = new Task();
+				obj.setId(rs.getInt("id"));
+				obj.setTitulo(rs.getString("title"));
+				obj.setDescricao(rs.getString("description"));
+				obj.setDataEntrega(rs.getDate("data_entrega"));
+				obj.setStatus(rs.getString("status"));
+				obj.setUser(objU);
+				return obj;
+			}
+		} catch (SQLException e) {
+			throw new DbException("Error" + e.getMessage());
+		} finally {
+			try {
+				if (st != null)
+					st.close();
+				if (rs != null)
+				rs.close();
+			} catch (SQLException e) {
+				throw new DbException("Error closing statement:" + e.getMessage());
+			}
+		}return null;
 	}
 
 	@Override
 	public List<Task> findByUser(User user) {
-		// TODO Auto-generated method stub
 		return null;
+		
 	}
 }

@@ -9,7 +9,7 @@ public interface TaskDao {
 	void update (Task obj);
 	void deleteById(Integer Id);
 	List<Task>findAll();
-	List<Task>findById(Task Id);
+	Task findById(Integer Id);
 	List<Task>findByUser(User user);
 	
 }

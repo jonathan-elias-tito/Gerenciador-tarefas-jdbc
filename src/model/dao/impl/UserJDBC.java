@@ -149,6 +149,7 @@ public class UserJDBC implements UserDao {
 				obj.setId(rs.getInt("Id"));
 				obj.setName(rs.getString("name"));
 				obj.setEmail(rs.getString("email"));
+				
 				lista.add(obj);
 			}
 			return lista;
