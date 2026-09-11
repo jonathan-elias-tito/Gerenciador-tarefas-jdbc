@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import db.DbConn;
 import db.DbException;
 import model.dao.TaskDao;
 import model.entities.Task;
@@ -17,11 +18,10 @@ import model.entities.User;
 
 public class TaskJDBC implements TaskDao {
 
-	private static Connection conn = null;
+	private Connection conn = null;
 
 	public TaskJDBC(Connection conn) {
 		this.conn = conn;
-		;
 	}
 
 	@Override
@@ -30,8 +30,9 @@ public class TaskJDBC implements TaskDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-					"INSERT INTO Task (title,description,data_entrega,status,user_id) " + "VALUES  (?,?,?,?,?) ",
-					Statement.RETURN_GENERATED_KEYS);
+					"INSERT INTO Task (title,description,data_entrega,status,user_id) " 
+			+ "VALUES  (?,?,?,?,?) "
+			,Statement.RETURN_GENERATED_KEYS);
 			st.setString(1, obj.getTitulo());
 			st.setString(2, obj.getDescricao());
 			st.setDate(3, new java.sql.Date(obj.getDataEntrega().getTime()));
@@ -50,14 +51,8 @@ public class TaskJDBC implements TaskDao {
 		} catch (SQLException e) {
 			throw new DbException("Error " + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				throw new DbException("Error close statement and resultset" + e.getMessage());
-			}
+			DbConn.closeResultSet(rs);
+			DbConn.closerStatement(st);
 		}
 
 	}
@@ -81,12 +76,7 @@ public class TaskJDBC implements TaskDao {
 		} catch (SQLException e) {
 			throw new DbException("Error:" + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement:" + e.getMessage());
-			}
+			DbConn.closerStatement(st);
 		}
 	}
 
@@ -105,12 +95,7 @@ public class TaskJDBC implements TaskDao {
 		} catch (SQLException e) {
 			throw new DbException("Error:" + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement:" + e.getMessage());
-			}
+			DbConn.closerStatement(st);
 		}
 	}
 
@@ -127,34 +112,18 @@ public class TaskJDBC implements TaskDao {
 			while (rs.next()) {
 				User objU = map.get(rs.getInt("user_id"));
 				if (objU == null) {
-					objU = new User();
-					objU.setId(rs.getInt("user_id"));
-					objU.setName(rs.getString("user_name"));
-					objU.setEmail(rs.getString("user_email"));
+					objU = newUser(rs);
 					map.put(rs.getInt("user_id"), objU);
 				}
-				Task obj = new Task();
-				obj.setId(rs.getInt("id"));
-				obj.setTitulo(rs.getString("title"));
-				obj.setDescricao(rs.getString("description"));
-				obj.setDataEntrega(rs.getDate("data_entrega"));
-				obj.setStatus(rs.getString("status"));
-				obj.setId(rs.getInt("id"));
-				obj.setUser(objU);
+				Task obj = newTask(rs, objU);
 				lista.add(obj);
 			}
 			return lista;
 		} catch (SQLException e) {
 			throw new DbException("Error:" + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement and resultset:" + e.getMessage());
-			}
+			DbConn.closeResultSet(rs);
+			DbConn.closerStatement(st);
 		}
 	}
 
@@ -169,33 +138,16 @@ public class TaskJDBC implements TaskDao {
 			rs = st.executeQuery();
 
 			if (rs.next()) {
-				User objU = new User();
-				objU.setId(rs.getInt("user_id"));
-				objU.setName(rs.getString("user_name"));
-				objU.setEmail(rs.getString("user_email"));
-
-				Task obj = new Task();
-				obj.setId(rs.getInt("id"));
-				obj.setTitulo(rs.getString("title"));
-				obj.setDescricao(rs.getString("description"));
-				obj.setDataEntrega(rs.getDate("data_entrega"));
-				obj.setStatus(rs.getString("status"));
-				obj.setUser(objU);
-
+				User objU = newUser(rs);
+				Task obj = newTask(rs, objU);
 				return obj;
 			}
 			return null;
 		} catch (SQLException e) {
 			throw new DbException("Error: " + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement and resultset:" + e.getMessage());
-			}
+			DbConn.closeResultSet(rs);
+			DbConn.closerStatement(st);
 		}
 
 	}
@@ -212,79 +164,68 @@ public class TaskJDBC implements TaskDao {
 			List<Task> lista = new ArrayList<>();
 			Map<Integer, User> map = new HashMap<>();
 			while (rs.next()) {
-				User objT = map.get(rs.getInt("user_id"));
-				if (objT == null) {
-					objT = new User();
-					objT.setId(rs.getInt("user_id"));
-					objT.setName(rs.getString("user_name"));
-					objT.setEmail(rs.getString("user_email"));
-					map.put(rs.getInt("user_id"), objT);
+				User objU = map.get(rs.getInt("user_id"));
+				if (objU == null) {
+					objU = newUser(rs);
+					map.put(rs.getInt("user_id"), objU);
 				}
-				Task objT2 = new Task();
-				objT2.setId(rs.getInt("id"));
-				objT2.setTitulo(rs.getString("title"));
-				objT2.setDescricao(rs.getString("description"));
-				objT2.setDataEntrega(rs.getDate("data_entrega"));
-				objT2.setStatus(rs.getString("status"));
-				objT2.setUser(objT);
-				lista.add(objT2);
+				Task objT = newTask(rs, objU);
+				lista.add(objT);
 			}
 			return lista;
 		} catch (SQLException e) {
 			throw new DbException("Error: " + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement and resultset:" + e.getMessage());
-			}
+			DbConn.closeResultSet(rs);
+			DbConn.closerStatement(st);
 		}
 
 	}
-	public List<Task> findByStatus(String status){
+
+	public List<Task> findByStatus(String status) {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			st =  conn.prepareStatement("SELECT task.*, user.name AS user_name, user.email AS user_email "
+			st = conn.prepareStatement("SELECT task.*, user.name AS user_name, user.email AS user_email "
 					+ "FROM task INNER JOIN user ON task.user_id = user.id " + "WHERE status = ? ");
-			st.setString(1,status );
+			st.setString(1, status);
 			rs = st.executeQuery();
-			List<Task>lista = new ArrayList<>();
-			Map<Integer ,User> map = new HashMap<>();
-			while(rs.next()) {
-				User obj = map.get(rs.getInt("user_id"));
-				if(obj == null) {
-					User obj1 = new User();
-					obj1.setId(rs.getInt("user_id"));
-					obj1.setName(rs.getString("user_name"));
-					obj1.setEmail(rs.getString("user_email"));
-					map.put(rs.getInt("user_id"), obj1);
+			List<Task> lista = new ArrayList<>();
+			Map<Integer, User> map = new HashMap<>();
+			while (rs.next()) {
+				User objU = map.get(rs.getInt("user_id"));
+				if (objU == null) {
+					objU = newUser(rs);
+					map.put(rs.getInt("user_id"), objU);
 				}
-				Task objT = new Task();
-				objT.setId(rs.getInt("id"));
-				objT.setTitulo(rs.getString("title"));
-				objT.setDescricao(rs.getString("description"));
-				objT.setStatus(rs.getString("status"));
-				objT.setDataEntrega(rs.getDate("data_entrega"));
-				objT.setUser(obj);
+				Task objT = newTask(rs, objU);
 				lista.add(objT);
 			}
 			return lista;
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new DbException("Error: " + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement and resultset:" + e.getMessage());
-			}
+			DbConn.closeResultSet(rs);
+			DbConn.closerStatement(st);
 		}
-		
+	}
+
+	private Task newTask(ResultSet rs, User user) throws SQLException {
+		Task obj = new Task();
+		obj.setId(rs.getInt("id"));
+		obj.setTitulo(rs.getString("title"));
+		obj.setDescricao(rs.getString("description"));
+		obj.setStatus(rs.getString("status"));
+		obj.setDataEntrega(rs.getDate("data_entrega"));
+		obj.setUser(user);
+		return obj;
+	}
+
+	private User newUser(ResultSet rs) throws SQLException {
+		User obj = new User();
+		obj.setId(rs.getInt("user_id"));
+		obj.setName(rs.getString("user_name"));
+		obj.setEmail(rs.getString("user_email"));
+		return obj;
 	}
 }

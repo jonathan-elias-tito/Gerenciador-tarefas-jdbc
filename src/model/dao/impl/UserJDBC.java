@@ -10,12 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import db.DbConn;
 import db.DbException;
 import model.dao.UserDao;
 import model.entities.User;
 
 public class UserJDBC implements UserDao {
-	private static Connection conn = null;
+	private Connection conn = null;
 
 	public UserJDBC(Connection conn) {
 		this.conn = conn;
@@ -39,7 +40,6 @@ public class UserJDBC implements UserDao {
 					int id = rs.getInt(1);
 					obj.setId(id);
 				}
-				rs.close();
 
 			} else {
 				throw new DbException("Insert failed: No rows affected.");
@@ -48,12 +48,8 @@ public class UserJDBC implements UserDao {
 		} catch (SQLException e) {
 			throw new DbException("Error:" + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement:" + e.getMessage());
-			}
+			DbConn.closeResultSet(rs);
+			DbConn.closerStatement(st);
 		}
 	}
 
@@ -73,12 +69,7 @@ public class UserJDBC implements UserDao {
 		} catch (SQLException e) {
 			throw new DbException("Error:" + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement:" + e.getMessage());
-			}
+			DbConn.closerStatement(st);
 		}
 	}
 
@@ -86,7 +77,7 @@ public class UserJDBC implements UserDao {
 	public void deleteById(Integer Id) {
 		PreparedStatement st = null;
 		try {
-			st = conn.prepareStatement("DELETE FROM User  WHERE Id = ? ");
+			st = conn.prepareStatement("DELETE FROM User  " + "WHERE Id = ? ");
 			st.setInt(1, Id);
 			int rows = st.executeUpdate();
 			if (rows == 0) {
@@ -95,12 +86,7 @@ public class UserJDBC implements UserDao {
 		} catch (SQLException e) {
 			throw new DbException("Error on delete" + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement:" + e.getMessage());
-			}
+			DbConn.closerStatement(st);
 		}
 	}
 
@@ -113,25 +99,15 @@ public class UserJDBC implements UserDao {
 			st.setInt(1, Id);
 			rs = st.executeQuery();
 			if (rs.next()) {
-				User obj = new User();
-				obj.setId(rs.getInt("id"));
-				obj.setName(rs.getString("name"));
-				obj.setEmail(rs.getString("email"));
+				User obj = newUser(rs);
 				return obj;
 			}
 			return null;
 		} catch (SQLException e) {
 			throw new DbException("Error in connection:" + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-				if (rs != null)
-					rs.close();
-
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement:" + e.getMessage());
-			}
+			DbConn.closeResultSet(rs);
+			DbConn.closerStatement(st);
 		}
 	}
 
@@ -145,26 +121,25 @@ public class UserJDBC implements UserDao {
 			List<User> lista = new ArrayList<>();
 			while (rs.next()) {
 
-				User obj = new User();
-				obj.setId(rs.getInt("Id"));
-				obj.setName(rs.getString("name"));
-				obj.setEmail(rs.getString("email"));
-				
+				User obj = newUser(rs);
 				lista.add(obj);
 			}
 			return lista;
 		} catch (SQLException e) {
 			throw new DbException("Error in connection:" + e.getMessage());
 		} finally {
-			try {
-				if (st != null)
-					st.close();
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				throw new DbException("Error closing statement:" + e.getMessage());
-			}
+			DbConn.closeResultSet(rs);
+			DbConn.closerStatement(st);
 		}
 	}
+
+	private User newUser(ResultSet rs) throws SQLException {
+		User obj = new User();
+		obj.setId(rs.getInt("id"));
+		obj.setName(rs.getString("name"));
+		obj.setEmail(rs.getString("email"));
+		return obj;
+
+	};
 
 }

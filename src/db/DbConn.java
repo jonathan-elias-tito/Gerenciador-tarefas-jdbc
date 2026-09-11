@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 public class DbConn {
@@ -40,23 +42,33 @@ public class DbConn {
 
 //Metodo que captura as propriedades do Banco de dados
 	private static Properties getProperties() {
-		FileInputStream fs = null;
-		try {
-
-			fs = new FileInputStream("db.properties");
+		try (FileInputStream fs = new FileInputStream("db.properties");) {
 			Properties props = new Properties();
 			props.load(fs);
 			return props;
 		} catch (IOException e) {
 			throw new DbException("Erro ao abrir arquivo causa:" + e.getMessage());
 		} finally {
+		}
+	}
 
-			if (fs != null) {
-				try {
-					fs.close();
-				} catch (IOException e) {
-					throw new DbException("Erro ao fechar arquivo causa:" + e.getMessage());
-				}
+	public static void closeResultSet(ResultSet rs) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				throw new DbException("Error in close results set" + e.getMessage());
+			}
+		}
+
+	}
+
+	public static void closerStatement(Statement st) {
+		if (st != null) {
+			try {
+				st.close();
+			} catch (SQLException e) {
+				throw new DbException("Error in close Statement" + e.getMessage());
 			}
 		}
 	}
