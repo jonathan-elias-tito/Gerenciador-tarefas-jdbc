@@ -103,7 +103,7 @@ public class TaskJDBC implements TaskDao {
 			}
 
 		} catch (SQLException e) {
-			throw new DbException("Error on delete:" + e.getMessage());
+			throw new DbException("Error:" + e.getMessage());
 		} finally {
 			try {
 				if (st != null)
@@ -136,6 +136,7 @@ public class TaskJDBC implements TaskDao {
 				obj.setId(rs.getInt("id"));
 				obj.setTitulo(rs.getString("title"));
 				obj.setDescricao(rs.getString("description"));
+				obj.setDataEntrega(rs.getDate("data_entrega"));
 				obj.setStatus(rs.getString("status"));
 				obj.setId(rs.getInt("id"));
 				obj.setUser(objU);
@@ -143,16 +144,15 @@ public class TaskJDBC implements TaskDao {
 			}
 			return lista;
 		} catch (SQLException e) {
-			throw new DbException("Erro on findAll" + e.getMessage());
+			throw new DbException("Error:" + e.getMessage());
 		} finally {
 			try {
 				if (st != null)
 					st.close();
 				if (rs != null)
-					;
-				rs.close();
+					rs.close();
 			} catch (SQLException e) {
-				throw new DbException("Error closing statement:" + e.getMessage());
+				throw new DbException("Error closing statement and resultset:" + e.getMessage());
 			}
 		}
 	}
@@ -161,18 +161,18 @@ public class TaskJDBC implements TaskDao {
 	public Task findById(Integer Id) {
 		PreparedStatement st = null;
 		ResultSet rs = null;
-
 		try {
-			st = conn.prepareStatement("SELECT task.*, user.name AS user_name, user.email AS user_email  "
-					+"FROM task INNER JOIN user ON task.user_id = user.id " +
-		            "WHERE task.id = ? ");
+			st = conn.prepareStatement("SELECT task.*, user.name AS user_name, user.email AS user_email "
+					+ "FROM task INNER JOIN user ON task.user_id = user.id " + "WHERE task.id = ?");
 			st.setInt(1, Id);
 			rs = st.executeQuery();
+
 			if (rs.next()) {
 				User objU = new User();
 				objU.setId(rs.getInt("user_id"));
 				objU.setName(rs.getString("user_name"));
 				objU.setEmail(rs.getString("user_email"));
+
 				Task obj = new Task();
 				obj.setId(rs.getInt("id"));
 				obj.setTitulo(rs.getString("title"));
@@ -180,25 +180,28 @@ public class TaskJDBC implements TaskDao {
 				obj.setDataEntrega(rs.getDate("data_entrega"));
 				obj.setStatus(rs.getString("status"));
 				obj.setUser(objU);
+
 				return obj;
 			}
+			return null;
 		} catch (SQLException e) {
-			throw new DbException("Error" + e.getMessage());
+			throw new DbException("Error: " + e.getMessage());
 		} finally {
 			try {
 				if (st != null)
 					st.close();
 				if (rs != null)
-				rs.close();
+					rs.close();
 			} catch (SQLException e) {
-				throw new DbException("Error closing statement:" + e.getMessage());
+				throw new DbException("Error closing statement and resultset:" + e.getMessage());
 			}
-		}return null;
+		}
+
 	}
 
 	@Override
 	public List<Task> findByUser(User user) {
 		return null;
-		
+
 	}
 }

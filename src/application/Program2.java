@@ -1,7 +1,9 @@
 package application;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import db.DbConn;
 import model.dao.DaoFactory;
@@ -42,11 +44,11 @@ public class Program2 {
 //		task.insert(task2);
 //		System.out.println("Test delete");
 ////		task.deleteById(28);
-//		System.out.println("Test findAll");
-//		List<Task> lista = new ArrayList<>();
-//		lista = task.findAll();
-//		for (Task obj : lista) {
-//			System.out.println(obj);}
+	System.out.println("Test findAll");
+		List<Task> lista = new ArrayList<>();
+		lista = task.findAll();
+		for (Task obj : lista) {
+			System.out.println(obj);}
 		System.out.println("findById");	
 		 System.out.println(task.findById(50));
 	
