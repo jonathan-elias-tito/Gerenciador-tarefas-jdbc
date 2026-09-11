@@ -11,5 +11,6 @@ public interface TaskDao {
 	List<Task>findAll();
 	Task findById(Integer Id);
 	List<Task>findByUser(User user);
+	List<Task>findByStatus(String status);
 	
 }

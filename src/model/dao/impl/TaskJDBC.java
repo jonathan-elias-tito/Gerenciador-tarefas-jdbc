@@ -244,4 +244,47 @@ public class TaskJDBC implements TaskDao {
 		}
 
 	}
+	public List<Task> findByStatus(String status){
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st =  conn.prepareStatement("SELECT task.*, user.name AS user_name, user.email AS user_email "
+					+ "FROM task INNER JOIN user ON task.user_id = user.id " + "WHERE status = ? ");
+			st.setString(1,status );
+			rs = st.executeQuery();
+			List<Task>lista = new ArrayList<>();
+			Map<Integer ,User> map = new HashMap<>();
+			while(rs.next()) {
+				User obj = map.get(rs.getInt("user_id"));
+				if(obj == null) {
+					User obj1 = new User();
+					obj1.setId(rs.getInt("user_id"));
+					obj1.setName(rs.getString("user_name"));
+					obj1.setEmail(rs.getString("user_email"));
+					map.put(rs.getInt("user_id"), obj1);
+				}
+				Task objT = new Task();
+				objT.setId(rs.getInt("id"));
+				objT.setTitulo(rs.getString("title"));
+				objT.setDescricao(rs.getString("description"));
+				objT.setStatus(rs.getString("status"));
+				objT.setDataEntrega(rs.getDate("data_entrega"));
+				objT.setUser(obj);
+				lista.add(objT);
+			}
+			return lista;
+		}catch (SQLException e) {
+			throw new DbException("Error: " + e.getMessage());
+		} finally {
+			try {
+				if (st != null)
+					st.close();
+				if (rs != null)
+					rs.close();
+			} catch (SQLException e) {
+				throw new DbException("Error closing statement and resultset:" + e.getMessage());
+			}
+		}
+		
+	}
 }

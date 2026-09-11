@@ -45,9 +45,15 @@ public class Program2 {
 		task.setStatus("Concluido");
 		taskDao.update(task);
 		System.out.println("Update completed!");
-
+		
 //		System.out.println("\n=== TEST 6: delete ===");
 //		taskDao.deleteById(newTask.getId());
 //		System.out.println("Delete completed!");
+		
+		System.out.println("\n=== TEST 7: findByStatus ===");
+		list=taskDao.findByStatus("Concluido"); 
+		for(Task obj: list) {
+			System.out.println(obj);
+		}
 	}
 }
