@@ -126,12 +126,13 @@ public class TaskJDBC implements TaskDao {
 			Map<Integer, User> map = new HashMap<>();
 			while (rs.next()) {
 				User objU = map.get(rs.getInt("user_id"));
-				if (objU == null)
+				if (objU == null) {
 					objU = new User();
-				objU.setId(rs.getInt("user_id"));
-				objU.setName(rs.getString("user_name"));
-				objU.setEmail(rs.getString("user_email"));
-				map.put(rs.getInt("user_id"), objU);
+					objU.setId(rs.getInt("user_id"));
+					objU.setName(rs.getString("user_name"));
+					objU.setEmail(rs.getString("user_email"));
+					map.put(rs.getInt("user_id"), objU);
+				}
 				Task obj = new Task();
 				obj.setId(rs.getInt("id"));
 				obj.setTitulo(rs.getString("title"));
@@ -201,7 +202,46 @@ public class TaskJDBC implements TaskDao {
 
 	@Override
 	public List<Task> findByUser(User user) {
-		return null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement("SELECT task.*, user.name AS user_name, user.email AS user_email "
+					+ "FROM task INNER JOIN user ON task.user_id = user.id " + "WHERE user_id = ? ");
+			st.setInt(1, user.getId());
+			rs = st.executeQuery();
+			List<Task> lista = new ArrayList<>();
+			Map<Integer, User> map = new HashMap<>();
+			while (rs.next()) {
+				User objT = map.get(rs.getInt("user_id"));
+				if (objT == null) {
+					objT = new User();
+					objT.setId(rs.getInt("user_id"));
+					objT.setName(rs.getString("user_name"));
+					objT.setEmail(rs.getString("user_email"));
+					map.put(rs.getInt("user_id"), objT);
+				}
+				Task objT2 = new Task();
+				objT2.setId(rs.getInt("id"));
+				objT2.setTitulo(rs.getString("title"));
+				objT2.setDescricao(rs.getString("description"));
+				objT2.setDataEntrega(rs.getDate("data_entrega"));
+				objT2.setStatus(rs.getString("status"));
+				objT2.setUser(objT);
+				lista.add(objT2);
+			}
+			return lista;
+		} catch (SQLException e) {
+			throw new DbException("Error: " + e.getMessage());
+		} finally {
+			try {
+				if (st != null)
+					st.close();
+				if (rs != null)
+					rs.close();
+			} catch (SQLException e) {
+				throw new DbException("Error closing statement and resultset:" + e.getMessage());
+			}
+		}
 
 	}
 }

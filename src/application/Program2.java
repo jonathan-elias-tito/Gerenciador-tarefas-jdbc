@@ -1,7 +1,6 @@
 package application;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,42 +14,40 @@ import model.entities.User;
 public class Program2 {
 
 	public static void main(String[] args) {
-
 		Connection conn = DbConn.initConection();
-		System.out.println("Connected");
-		System.out.println("Test insert");
-		TaskDao task = DaoFactory.createTaskDao();
-		User u1 = new User();
-		UserDao user = DaoFactory.createUserDao();
-//		ask2 = new Task(null, "Banho", "Tomar banho", new Date(), "Pendente", u1);
-////		task.insert(task1);
-//		task.insert(task2);
-//		System.out.println("User:" + task1.getUser().getName());
-//		System.out.println("Test update");
-////		task1.setStatus("Concluido");
-////		task.update(task1);
-//		task.insert(task2);
-//		System.out.println("Test delete");
-////		task.deleteById(28);
-//		System.out.println("Test findAll");u1 = user.findById(14);
-	Task task1 = new Task(null, "Cabeleleiro", "Cortar cabelo", new Date(), "Pendente", u1);
-//		Task task2 = new Task(null, "Banho", "Tomar banho", new Date(), "Pendente", u1);
-////		task.insert(task1);
-//		task.insert(task2);
-//		System.out.println("User:" + task1.getUser().getName());
-//		System.out.println("Test update");
-////		task1.setStatus("Concluido");
-////		task.update(task1);
-//		task.insert(task2);
-//		System.out.println("Test delete");
-////		task.deleteById(28);
-	System.out.println("Test findAll");
-		List<Task> lista = new ArrayList<>();
-		lista = task.findAll();
-		for (Task obj : lista) {
-			System.out.println(obj);}
-		System.out.println("findById");	
-		 System.out.println(task.findById(50));
-	
+		TaskDao taskDao = DaoFactory.createTaskDao();
+		UserDao userDao = DaoFactory.createUserDao();
+
+		System.out.println("=== TEST 1: findById ===");
+		Task task = taskDao.findById(50);
+		System.out.println(task);
+
+		System.out.println("\n=== TEST 2: findByUser ===");
+		User user = userDao.findById(14);
+		List<Task> list = taskDao.findByUser(user);
+		for (Task obj : list) {
+			System.out.println(obj);
+		}
+
+		System.out.println("\n=== TEST 3: findAll ===");
+		list = taskDao.findAll();
+		for (Task obj : list) {
+			System.out.println(obj);
+		}
+
+		System.out.println("\n=== TEST 4: insert ===");
+		Task newTask = new Task(null, "Treino", "Ir para a academia", new Date(), "Pendente", user);
+		taskDao.insert(newTask);
+		System.out.println("Inserted! New id = " + newTask.getId());
+
+		System.out.println("\n=== TEST 5: update ===");
+		task = taskDao.findById(newTask.getId());
+		task.setStatus("Concluido");
+		taskDao.update(task);
+		System.out.println("Update completed!");
+
+//		System.out.println("\n=== TEST 6: delete ===");
+//		taskDao.deleteById(newTask.getId());
+//		System.out.println("Delete completed!");
 	}
 }
