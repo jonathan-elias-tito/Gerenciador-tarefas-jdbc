@@ -1,13 +1,11 @@
 package application;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 
 import db.DbConn;
 import model.dao.DaoFactory;
 import model.dao.UserDao;
-import model.dao.impl.UserJDBC;
 import model.entities.User;
 
 public class Program {
@@ -15,30 +13,35 @@ public class Program {
 	public static void main(String[] args) {
 
 		Connection conn = DbConn.initConection();
-		System.out.println("Connected");
-		System.out.println("Test insert");
-		UserDao user = DaoFactory.createUserDao();
-		User u1 = new User(null,"Jonathan","Jonh@gmail.com");
-		User u2 = new User(null,"Sarah","Sarah@gmail.com");
+		System.out.println("--- CONEXÃO REALIZADA ---");
 
-//		user.insert(u2);
-//		System.out.println("Test update");
-//		u1.setName("Jonathan Elias");
-//		u1.setEmail("jonElias@gmail.com");
-//		user.update(u1);
-//		System.out.println("Test delete");
-//		user.deleteById(2)?;
-//		System.out.println("Test findById");
-//		User u2=user.findById(14);
-//		System.out.println(u2);
-		System.out.println("Test findAll");
-		User obj = new User();
-		List<User> lista = new ArrayList<>();
-		lista = user.findAll();
-		for(User obj1: lista) {
-			System.out.println(obj1);
+		UserDao userDao = DaoFactory.createUserDao();
+
+		System.out.println("\n=== TEST 1: findById ===");
+		User user1 = userDao.findById(1); // Cassio
+		System.out.println(user1);
+
+		System.out.println("\n=== TEST 2: findAll ===");
+		List<User> list = userDao.findAll();
+		for (User obj : list) {
+			System.out.println(obj);
 		}
-		
-	}
 
+		System.out.println("\n=== TEST 3: insert ===");
+		User newUser = new User(null, "Jonathan", "jonathan@email.com");
+		userDao.insert(newUser);
+		System.out.println("Inserido! Novo id de usuário = " + newUser.getId());
+
+		System.out.println("\n=== TEST 4: update ===");
+		newUser.setName("Jonathan Elias");
+		newUser.setEmail("jonathan.elias@email.com");
+		userDao.update(newUser);
+		System.out.println("Update efetuado com sucesso!");
+
+		System.out.println("\n=== TEST 5: delete ===");
+		userDao.deleteById(newUser.getId());
+		System.out.println("Deleção de teste realizada!");
+
+		DbConn.closeConnection();
+	}
 }

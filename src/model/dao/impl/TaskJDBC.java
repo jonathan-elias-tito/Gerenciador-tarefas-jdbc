@@ -30,9 +30,8 @@ public class TaskJDBC implements TaskDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-					"INSERT INTO Task (title,description,data_entrega,status,user_id) " 
-			+ "VALUES  (?,?,?,?,?) "
-			,Statement.RETURN_GENERATED_KEYS);
+					"INSERT INTO Task (title,description,data_entrega,status,user_id) " + "VALUES  (?,?,?,?,?) ",
+					Statement.RETURN_GENERATED_KEYS);
 			st.setString(1, obj.getTitulo());
 			st.setString(2, obj.getDescricao());
 			st.setDate(3, new java.sql.Date(obj.getDataEntrega().getTime()));

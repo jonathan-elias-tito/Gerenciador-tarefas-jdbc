@@ -48,7 +48,6 @@ public class DbConn {
 			return props;
 		} catch (IOException e) {
 			throw new DbException("Erro ao abrir arquivo causa:" + e.getMessage());
-		} finally {
 		}
 	}
 

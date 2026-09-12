@@ -1,7 +1,8 @@
 package model.dao;
 
-import java.sql.ResultSet;
+
 import java.util.List;
+
 import model.entities.Task;
 import model.entities.User;
 
