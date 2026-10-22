@@ -58,7 +58,7 @@ src/
       ├── Task.java           # Entidade Task
       └── User.java           # Entidade User
 ```
-## 👨‍💻 Desenvolvedore
+## 👨‍💻 Desenvolvedor
 
 ### Jonathan Elias
 - [LinkedIn](https://www.linkedin.com/)
