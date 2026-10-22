@@ -44,6 +44,7 @@ src/
  │    ├── Program.java        # Testes das operações de Task
  │    └── Program2.java       # Testes das operações de User
  ├── db/
+
  │    ├── DbConn.java         # Conexão e fechamento de recursos JDBC
  │    └── DbException.java    # Exceção customizada de banco de dados
  ├── model.dao/
@@ -56,3 +57,9 @@ src/
  └── model.entities/
       ├── Task.java           # Entidade Task
       └── User.java           # Entidade User
+## 👨‍💻 Desenvolvedores
+
+### Jonathan Elias
+- [LinkedIn](https://www.linkedin.com/)
+- [GitHub](https://github.com/jonathan-elias-tito)
+
