@@ -57,6 +57,7 @@ src/
  └── model.entities/
       ├── Task.java           # Entidade Task
       └── User.java           # Entidade User
+```
 ## 👨‍💻 Desenvolvedores
 
 ### Jonathan Elias
